@@ -65,7 +65,27 @@ class OrderController extends Controller
                 $product->decrement('stock', $item->quantity);
             }
 
-            $order->update(['total_amount' => $totalAmount]);
+            // Áp dụng Coupon nếu có
+            $discountAmount = 0;
+            if ($request->has('coupon_code')) {
+                $coupon = \App\Models\Coupon::where('code', $request->coupon_code)->first();
+                if ($coupon && (!$coupon->valid_until || now()->lessThanOrEqualTo($coupon->valid_until)) && (!$coupon->usage_limit || $coupon->used_count < $coupon->usage_limit)) {
+                    
+                    if ($coupon->discount_type == 'percent') {
+                        $discountAmount = ($totalAmount * $coupon->discount_amount) / 100;
+                    } else {
+                        $discountAmount = $coupon->discount_amount;
+                    }
+                    
+                    $coupon->increment('used_count');
+                    $order->update([
+                        'coupon_id' => $coupon->id,
+                        'discount_amount' => $discountAmount
+                    ]);
+                }
+            }
+
+            $order->update(['total_amount' => max(0, $totalAmount - $discountAmount)]);
 
             $cart->items()->delete();
 

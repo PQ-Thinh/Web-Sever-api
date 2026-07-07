@@ -41,4 +41,29 @@ class ReviewController extends Controller
 
         return response()->json($review, 201);
     }
+
+    public function update(Request $request, Review $review)
+    {
+        if ($review->user_id !== $request->user()->id) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $request->validate([
+            'rating' => 'integer|min:1|max:5',
+            'comment' => 'nullable|string'
+        ]);
+
+        $review->update($request->only(['rating', 'comment']));
+        return response()->json($review);
+    }
+
+    public function destroy(Request $request, Review $review)
+    {
+        if ($review->user_id !== $request->user()->id && $request->user()->role !== 'admin') {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $review->delete();
+        return response()->json(['message' => 'Deleted successfully']);
+    }
 }

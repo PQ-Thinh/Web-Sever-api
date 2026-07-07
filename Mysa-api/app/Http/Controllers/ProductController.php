@@ -22,6 +22,15 @@ class ProductController extends Controller
         return response()->json($query->paginate(15));
     }
 
+    public function show($id)
+    {
+        $product = Product::with(['category', 'reviews.user:id,name,avatar'])
+            ->withAvg('reviews', 'rating')
+            ->findOrFail($id);
+            
+        return response()->json($product);
+    }
+
     public function store(Request $request)
     {
         $request->validate([
