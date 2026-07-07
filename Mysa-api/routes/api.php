@@ -33,10 +33,19 @@ Route::middleware('auth:sanctum')->group(function () {
     // API Đặt hàng (từ giỏ hàng)
     Route::apiResource('orders', OrderController::class)->only(['index', 'store', 'show']);
 
+    // API Thêm Đánh giá
+    Route::post('reviews', [\App\Http\Controllers\ReviewController::class, 'store']);
+
     // Protected APIs (Chỉ dành cho Admin)
     Route::middleware('is_admin')->group(function () {
         // Thêm/Sửa/Xóa Danh mục và Sản phẩm
         Route::apiResource('categories', CategoryController::class)->except(['index', 'show']);
         Route::apiResource('products', ProductController::class)->except(['index', 'show']);
+        
+        // Quản lý Đơn hàng (Cập nhật trạng thái)
+        Route::apiResource('orders', OrderController::class)->only(['update']);
     });
 });
+
+// Xem đánh giá (Public)
+Route::get('products/{product}/reviews', [\App\Http\Controllers\ReviewController::class, 'index']);

@@ -9,7 +9,7 @@ class ProductController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Product::with('category');
+        $query = Product::with('category')->withAvg('reviews', 'rating');
 
         if ($request->has('search')) {
             $query->where('name', 'LIKE', '%' . $request->search . '%');

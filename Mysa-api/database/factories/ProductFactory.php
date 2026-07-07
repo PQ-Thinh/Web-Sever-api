@@ -14,6 +14,8 @@ class ProductFactory extends Factory
             'price' => $this->faker->numberBetween(100000, 50000000),
             'stock' => $this->faker->numberBetween(0, 100),
             'category_id' => Category::inRandomOrder()->first()->id ?? 1,
+            'image_url' => 'https://picsum.photos/400/400?random=' . rand(1, 1000),
+            'description' => $this->faker->paragraph(3),
         ];
     }
 }

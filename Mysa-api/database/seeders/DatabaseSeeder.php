@@ -66,6 +66,16 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // Tạo thêm 50 sản phẩm ngẫu nhiên để test phân trang
-        Product::factory(50)->create();
+        $products = Product::factory(50)->create();
+
+        // Tạo Đánh giá mẫu cho các sản phẩm
+        foreach ($products->random(10) as $product) {
+            \App\Models\Review::create([
+                'user_id' => 2, // Khách hàng
+                'product_id' => $product->id,
+                'rating' => rand(3, 5),
+                'comment' => 'Sản phẩm này rất tốt, đáng đồng tiền bát gạo!'
+            ]);
+        }
     }
 }
